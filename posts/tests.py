@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from .models import Post
 from django.utils import timezone
 
@@ -20,5 +20,21 @@ class PostModelTest(TestCase):
     def test_post_str(self):
         self.assertEqual(str(self.post), "Test Title")
 #        self.assertEqual(str(self.post), "Test Content")
+class PostViewTest(TestCase):
+    
+    def setUp(self):
+        self.client = Client()
+        Post.objects.create(title="Test Title1", content="Test Content1", author="Test Author1")
+        Post.objects.create(title="Test Title2", content="Test Content2", author="Test Author2")
+
+    def test_post_list_view_status(self):
+        response = self.client.get('/posts/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_post_list_view_content(self):
+        response = self.client.get('/posts/')
+        self.assertContains(response, "Test Title1")
+        self.assertContains(response, "Test Title2")
+
 
 # Create your tests here.
